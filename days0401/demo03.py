@@ -89,5 +89,5 @@ else:
     print('Person没有study方法')
 
 
-print('this is pull test')
+
 
