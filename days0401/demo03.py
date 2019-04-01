@@ -87,3 +87,7 @@ if hasattr(Person, 'study'):
     print('Person有study方法')
 else:
     print('Person没有study方法')
+
+
+print('this is pull test')
+
