@@ -9,40 +9,42 @@ import requests
 def counttime(f):
     def fun(*args):
         start = time.time()
-        f(*args)
+        # print(f, type(args[0]))
+        # print(args[0])
+        f(args[0])
         end = time.time()
         print('%s消耗%s'%(f.__name__, end-start))
     return fun
 
 
-@counttime
-def singleprocess(urllist):
-    # print('==')
-    for i in urllist:
-        picname = i.split('/')[-1]
-        pic = requests.get(i).content
-        with open('imgs/%s' % (picname,), 'wb') as f:
-            f.write(pic)
-            f.close()
+def save(urls):
+    # print('111')
+    # print(urls)
+    picname = urls.split('/')[-1]
+    pic = requests.get(urls).content
+    # print('33')
+    with open('imgs/%s' % (picname,), 'wb') as f:
+        # print('222')
+        f.write(pic)
+        f.close()
 
 
 @counttime
 def multiprocess(urllist):
-    print('++')
     pool = Pool(4)
-    queue = Manager().Queue()
+    queue = Manager().Queue(8)
+    # print(type(queue))
     for i in urllist:
         queue.put(i)
-    res = queue.empty()
-    print(queue.qsize())
-    print('--')
     while True:
-        if not res:
-            queue.get()
-            pool.apply_async(singleprocess, args=urllist)
+        if not queue.empty():
+            urls = queue.get()
+            # print(urls)
+            pool.apply_async(func=save, args=(urls,))
         else:
             break
-
+    pool.close()
+    pool.join()
 
 
 
